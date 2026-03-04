@@ -593,6 +593,67 @@ void loop() {
       },
     ],
   },
+  {
+    id: 'lcd-hello',
+    title: 'LCD 20x4 Display',
+    description: 'Display text on a 20x4 LCD using the LiquidCrystal library',
+    category: 'displays',
+    difficulty: 'intermediate',
+    code: `// LiquidCrystal Library - Hello World
+// Demonstrates the use a 20x4 LCD display
+
+#include <LiquidCrystal.h>
+
+// initialize the library by associating any needed LCD interface pin
+// with the arduino pin number it is connected to
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+void setup() {
+  // set up the LCD's number of columns and rows:
+  lcd.begin(20, 4);
+  // Print a message to the LCD.
+  lcd.print("Hello, Arduino!");
+  lcd.setCursor(0, 1);
+  lcd.print("Wokwi Emulator");
+  lcd.setCursor(0, 2);
+  lcd.print("LCD 2004 Test");
+}
+
+void loop() {
+  // set the cursor to column 0, line 3
+  lcd.setCursor(0, 3);
+  // print the number of seconds since reset:
+  lcd.print("Uptime: ");
+  lcd.print(millis() / 1000);
+}
+`,
+    components: [
+      {
+        type: 'wokwi-arduino-uno',
+        id: 'arduino-uno',
+        x: 100,
+        y: 100,
+        properties: {},
+      },
+      {
+        type: 'wokwi-lcd2004',
+        id: 'lcd1',
+        x: 450,
+        y: 100,
+        properties: { pins: 'full' },
+      },
+    ],
+    wires: [
+      { id: 'w-rs', start: { componentId: 'arduino-uno', pinName: '12' }, end: { componentId: 'lcd1', pinName: 'RS' }, color: 'green' },
+      { id: 'w-en', start: { componentId: 'arduino-uno', pinName: '11' }, end: { componentId: 'lcd1', pinName: 'E' }, color: 'green' },
+      { id: 'w-d4', start: { componentId: 'arduino-uno', pinName: '5' }, end: { componentId: 'lcd1', pinName: 'D4' }, color: 'blue' },
+      { id: 'w-d5', start: { componentId: 'arduino-uno', pinName: '4' }, end: { componentId: 'lcd1', pinName: 'D5' }, color: 'blue' },
+      { id: 'w-d6', start: { componentId: 'arduino-uno', pinName: '3' }, end: { componentId: 'lcd1', pinName: 'D6' }, color: 'blue' },
+      { id: 'w-d7', start: { componentId: 'arduino-uno', pinName: '2' }, end: { componentId: 'lcd1', pinName: 'D7' }, color: 'blue' },
+      // Power / Contrast logic is usually handled internally or ignored in basic simulation
+    ],
+  },
 ];
 
 // Get examples by category

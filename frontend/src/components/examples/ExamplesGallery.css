@@ -139,7 +139,11 @@
 .example-thumbnail img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+}
+
+.example-preview-image {
+  background-color: #1a1a1a;
 }
 
 .example-placeholder {
@@ -150,6 +154,46 @@
   gap: 10px;
   width: 100%;
   height: 100%;
+}
+
+.example-placeholder-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+  border: 2px dashed #444;
+}
+
+.placeholder-icon {
+  font-size: 72px;
+  opacity: 0.7;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.placeholder-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.component-count,
+.wire-count {
+  font-size: 13px;
+  color: #aaa;
+  font-weight: 500;
+}
+
+.component-count {
+  color: #00d9ff;
+}
+
+.wire-count {
+  color: #fbbf24;
 }
 
 .example-icon {

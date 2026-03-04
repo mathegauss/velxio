@@ -22,7 +22,7 @@ export class AVRSimulator {
   private program: Uint16Array | null = null;
   private running = false;
   private animationFrame: number | null = null;
-  private pinManager: PinManager;
+  public pinManager: PinManager;
   private speed = 1.0; // Simulation speed multiplier
   private lastPortBValue = 0;
   private lastPortCValue = 0;
@@ -246,5 +246,18 @@ export class AVRSimulator {
 
     avrInstruction(this.cpu);  // Execute the instruction
     this.cpu.tick();            // Update peripherals
+  }
+
+  /**
+   * Set the state of an Arduino pin externally (e.g. from a UI button)
+   */
+  setPinState(arduinoPin: number, state: boolean): void {
+    if (arduinoPin >= 0 && arduinoPin <= 7 && this.portD) {
+      this.portD.setPin(arduinoPin, state);
+    } else if (arduinoPin >= 8 && arduinoPin <= 13 && this.portB) {
+      this.portB.setPin(arduinoPin - 8, state);
+    } else if (arduinoPin >= 14 && arduinoPin <= 19 && this.portC) {
+      this.portC.setPin(arduinoPin - 14, state);
+    }
   }
 }

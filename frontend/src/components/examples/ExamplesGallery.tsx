@@ -128,13 +128,18 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
           >
             <div className="example-thumbnail">
               {example.thumbnail ? (
-                <img src={example.thumbnail} alt={example.title} />
+                <img src={example.thumbnail} alt={example.title} className="example-preview-image" />
               ) : (
-                <div className="example-placeholder">
-                  <span className="example-icon">{getCategoryIcon(example.category)}</span>
-                  <span className="example-components-count">
-                    {example.components.length} component{example.components.length !== 1 ? 's' : ''}
-                  </span>
+                <div className="example-placeholder-new">
+                  <div className="placeholder-icon">{getCategoryIcon(example.category)}</div>
+                  <div className="placeholder-text">
+                    <div className="component-count">
+                      {example.components.length} component{example.components.length !== 1 ? 's' : ''}
+                    </div>
+                    <div className="wire-count">
+                      {example.wires.length} wire{example.wires.length !== 1 ? 's' : ''}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

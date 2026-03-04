@@ -22,10 +22,15 @@ export const ExamplesPage: React.FC = () => {
     // Load the code into the editor
     setCode(example.code);
 
+    // Filter out Arduino component from examples (it's rendered separately in SimulatorCanvas)
+    const componentsWithoutArduino = example.components.filter(
+      (comp) => !comp.type.includes('arduino')
+    );
+
     // Load components into the simulator
     // Convert component type to metadataId (e.g., 'wokwi-led' -> 'led')
     setComponents(
-      example.components.map((comp) => ({
+      componentsWithoutArduino.map((comp) => ({
         id: comp.id,
         metadataId: comp.type.replace('wokwi-', ''),
         x: comp.x,

@@ -8,6 +8,7 @@ import { ComponentRegistry } from '../../services/ComponentRegistry';
 import { PinSelector } from './PinSelector';
 import { WireLayer } from './WireLayer';
 import { PinOverlay } from './PinOverlay';
+import { PartSimulationRegistry } from '../../simulation/parts';
 import type { ComponentMetadata } from '../../types/component-metadata';
 import './SimulatorCanvas.css';
 
@@ -73,17 +74,51 @@ export const SimulatorCanvas = () => {
   useEffect(() => {
     const unsubscribers: (() => void)[] = [];
 
-    components.forEach((component) => {
-      if (component.properties.pin !== undefined) {
-        const unsubscribe = pinManager.onPinChange(
-          component.properties.pin,
-          (pin, state) => {
-            // Update component state when pin changes
-            updateComponentState(component.id, state);
-            console.log(`Component ${component.id} on pin ${pin}: ${state ? 'HIGH' : 'LOW'}`);
+    // Helper to add subscription
+    const subscribeComponentToPin = (component: any, pin: number, componentPinName?: string) => {
+      const unsubscribe = pinManager.onPinChange(
+        pin,
+        (_pin, state) => {
+          // 1. Update React state for standard properties
+          updateComponentState(component.id, state);
+
+          // 2. Delegate to PartSimulationRegistry for custom visual updates
+          const logic = PartSimulationRegistry.get(component.metadataId);
+          if (logic && logic.onPinStateChange) {
+            const el = document.getElementById(component.id);
+            if (el) {
+              logic.onPinStateChange(componentPinName || 'A', state, el);
+            }
           }
+
+          console.log(`Component ${component.id} on pin ${pin}: ${state ? 'HIGH' : 'LOW'}`);
+        }
+      );
+      unsubscribers.push(unsubscribe);
+    };
+
+    components.forEach((component) => {
+      // 1. Subscribe by explicit pin property
+      if (component.properties.pin !== undefined) {
+        subscribeComponentToPin(component, component.properties.pin as number, 'A');
+      } else {
+        // 2. Subscribe by finding wires connected to arduino
+        const connectedWires = useSimulatorStore.getState().wires.filter(
+          w => w.start.componentId === component.id || w.end.componentId === component.id
         );
-        unsubscribers.push(unsubscribe);
+
+        connectedWires.forEach(wire => {
+          const isStartSelf = wire.start.componentId === component.id;
+          const selfEndpoint = isStartSelf ? wire.start : wire.end;
+          const otherEndpoint = isStartSelf ? wire.end : wire.start;
+
+          if (otherEndpoint.componentId === 'arduino-uno') {
+            const pin = parseInt(otherEndpoint.pinName, 10);
+            if (!isNaN(pin)) {
+              subscribeComponentToPin(component, pin, selfEndpoint.pinName);
+            }
+          }
+        });
       }
     });
 
@@ -344,7 +379,7 @@ export const SimulatorCanvas = () => {
           <ArduinoUno
             x={ARDUINO_POSITION.x}
             y={ARDUINO_POSITION.y}
-            led13={components.find((c) => c.id === 'led-builtin')?.properties.state || false}
+            led13={Boolean(components.find((c) => c.id === 'led-builtin')?.properties.state)}
           />
 
           {/* Arduino pin overlay */}

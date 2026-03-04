@@ -44,6 +44,7 @@ interface SimulatorState {
   removeComponent: (id: string) => void;
   updateComponent: (id: string, updates: Partial<Component>) => void;
   updateComponentState: (id: string, state: boolean) => void;
+  handleComponentEvent: (componentId: string, eventName: string, data?: any) => void;
   setComponents: (components: Component[]) => void;
 
   // Wire management (Phase 1)
@@ -217,9 +218,14 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
     updateComponentState: (id, state) => {
       set((prevState) => ({
         components: prevState.components.map((c) =>
-          c.id === id ? { ...c, properties: { ...c.properties, state } } : c
+          c.id === id ? { ...c, properties: { ...c.properties, state, value: state } } : c
         ),
       }));
+    },
+
+    handleComponentEvent: (_componentId, _eventName, _data) => {
+      // Legacy UI-based handling can be placed here if needed
+      // but device simulation events are now in DynamicComponent via PartSimulationRegistry
     },
 
     setComponents: (components) => {
