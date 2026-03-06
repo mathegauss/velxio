@@ -1,4 +1,4 @@
-# OpenWokwi - Arduino Emulator
+# Velxio - Arduino Emulator
 
 A fully local, open-source Arduino emulator inspired by [Wokwi](https://wokwi.com). Write Arduino code, compile it, and simulate it with real AVR8 CPU emulation and 48+ interactive electronic components — all running in your browser.
 
@@ -6,7 +6,7 @@ A fully local, open-source Arduino emulator inspired by [Wokwi](https://wokwi.co
 
 If you find this project helpful, please consider giving it a star! Your support helps the project grow and motivates continued development.
 
-[![GitHub stars](https://img.shields.io/github/stars/davidmonterocrespo24/openwokwi?style=social)](https://github.com/davidmonterocrespo24/openwokwi/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/davidmonterocrespo24/velxio?style=social)](https://github.com/davidmonterocrespo24/velxio/stargazers)
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-pink?logo=githubsponsors)](https://github.com/sponsors/davidmonterocrespo24)
 [![PayPal](https://img.shields.io/badge/Donate-PayPal-blue?logo=paypal)](https://paypal.me/odoonext)
 
@@ -196,8 +196,8 @@ arduino-cli core install rp2040:rp2040
 The fastest way to get started. Requires only [Docker](https://docs.docker.com/get-docker/) and Docker Compose.
 
 ```bash
-git clone https://github.com/davidmonterocrespo24/openwokwi.git
-cd openwokwi
+git clone https://github.com/davidmonterocrespo24/velxio.git
+cd velxio
 docker compose up --build
 ```
 
@@ -217,8 +217,8 @@ docker compose down
 
 #### 1. Clone the repository
 ```bash
-git clone https://github.com/davidmonterocrespo24/openwokwi.git
-cd openwokwi
+git clone https://github.com/davidmonterocrespo24/velxio.git
+cd velxio
 ```
 
 #### 2. Setup Backend
@@ -285,7 +285,7 @@ The frontend will be available at:
 ## Project Structure
 
 ```
-openwokwi/
+velxio/
 ├── frontend/                       # React + Vite + TypeScript
 │   ├── src/
 │   │   ├── components/

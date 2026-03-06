@@ -1,4 +1,4 @@
-# Estado del Proyecto - OpenWokwi Arduino Emulator
+# Estado del Proyecto - Velxio Arduino Emulator
 
 ## Resumen de Funcionalidades Implementadas
 

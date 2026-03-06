@@ -1,4 +1,4 @@
-# Project Architecture - OpenWokwi Arduino Emulator
+# Project Architecture - Velxio Arduino Emulator
 
 ## Overview
 
