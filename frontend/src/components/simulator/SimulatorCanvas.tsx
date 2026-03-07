@@ -1,6 +1,6 @@
 import { useSimulatorStore, ARDUINO_POSITION, BOARD_LABELS } from '../../store/useSimulatorStore';
 import type { BoardType } from '../../store/useSimulatorStore';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { ArduinoUno } from '../components-wokwi/ArduinoUno';
 import { NanoRP2040 } from '../components-wokwi/NanoRP2040';
 import { ComponentPickerModal } from '../ComponentPickerModal';
@@ -71,6 +71,25 @@ export const SimulatorCanvas = () => {
 
   // Canvas ref for coordinate calculations
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Pan & zoom state
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  // Use refs during active pan to avoid setState lag
+  const isPanningRef = useRef(false);
+  const panStartRef = useRef({ mouseX: 0, mouseY: 0, panX: 0, panY: 0 });
+  const panRef = useRef({ x: 0, y: 0 });
+  const zoomRef = useRef(1);
+
+  // Convert viewport coords to world (canvas) coords
+  const toWorld = useCallback((screenX: number, screenY: number) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return { x: screenX, y: screenY };
+    return {
+      x: (screenX - rect.left - panRef.current.x) / zoomRef.current,
+      y: (screenY - rect.top  - panRef.current.y) / zoomRef.current,
+    };
+  }, []);
 
   // Initialize simulator on mount
   useEffect(() => {
@@ -208,63 +227,73 @@ export const SimulatorCanvas = () => {
 
   // Component dragging handlers
   const handleComponentMouseDown = (componentId: string, e: React.MouseEvent) => {
-    // Don't start dragging if we're clicking on the pin selector or property dialog
     if (showPinSelector || showPropertyDialog) return;
 
     e.stopPropagation();
     const component = components.find((c) => c.id === componentId);
-    if (!component || !canvasRef.current) return;
+    if (!component) return;
 
-    // Record click start for click vs drag detection
     setClickStartTime(Date.now());
     setClickStartPos({ x: e.clientX, y: e.clientY });
 
-    // Get canvas position to convert viewport coords to canvas coords
-    const canvasRect = canvasRef.current.getBoundingClientRect();
-
-    // Calculate offset in canvas coordinate system
+    const world = toWorld(e.clientX, e.clientY);
     setDraggedComponentId(componentId);
     setDragOffset({
-      x: (e.clientX - canvasRect.left) - component.x,
-      y: (e.clientY - canvasRect.top) - component.y,
+      x: world.x - component.x,
+      y: world.y - component.y,
     });
     setSelectedComponentId(componentId);
   };
 
   const handleCanvasMouseMove = (e: React.MouseEvent) => {
-    if (!canvasRef.current) return;
+    // Handle active panning (ref-based, no setState lag)
+    if (isPanningRef.current) {
+      const dx = e.clientX - panStartRef.current.mouseX;
+      const dy = e.clientY - panStartRef.current.mouseY;
+      const newPan = {
+        x: panStartRef.current.panX + dx,
+        y: panStartRef.current.panY + dy,
+      };
+      panRef.current = newPan;
+      // Update the transform directly for zero-lag panning
+      const world = canvasRef.current?.querySelector('.canvas-world') as HTMLElement | null;
+      if (world) {
+        world.style.transform = `translate(${newPan.x}px, ${newPan.y}px) scale(${zoomRef.current})`;
+      }
+      return;
+    }
 
     // Handle component dragging
     if (draggedComponentId) {
-      const canvasRect = canvasRef.current.getBoundingClientRect();
-      const newX = e.clientX - canvasRect.left - dragOffset.x;
-      const newY = e.clientY - canvasRect.top - dragOffset.y;
-
+      const world = toWorld(e.clientX, e.clientY);
       updateComponent(draggedComponentId, {
-        x: Math.max(0, newX),
-        y: Math.max(0, newY),
+        x: Math.max(0, world.x - dragOffset.x),
+        y: Math.max(0, world.y - dragOffset.y),
       } as any);
     }
 
     // Handle wire creation preview
-    if (wireInProgress && canvasRef.current) {
-      const canvasRect = canvasRef.current.getBoundingClientRect();
-      const currentX = e.clientX - canvasRect.left;
-      const currentY = e.clientY - canvasRect.top;
-      updateWireInProgress(currentX, currentY);
+    if (wireInProgress) {
+      const world = toWorld(e.clientX, e.clientY);
+      updateWireInProgress(world.x, world.y);
     }
   };
 
   const handleCanvasMouseUp = (e: React.MouseEvent) => {
+    // Finish panning — commit ref value to state so React knows the final pan
+    if (isPanningRef.current) {
+      isPanningRef.current = false;
+      setPan({ ...panRef.current });
+      return;
+    }
+
     if (draggedComponentId) {
-      // Check if this was a click or a drag
       const timeDiff = Date.now() - clickStartTime;
       const posDiff = Math.sqrt(
         Math.pow(e.clientX - clickStartPos.x, 2) +
         Math.pow(e.clientY - clickStartPos.y, 2)
       );
 
-      // If moved < 5px and time < 300ms, treat as click
       if (posDiff < 5 && timeDiff < 300) {
         const component = components.find((c) => c.id === draggedComponentId);
         if (component) {
@@ -274,10 +303,55 @@ export const SimulatorCanvas = () => {
         }
       }
 
-      // Recalculate wire positions after moving component
       recalculateAllWirePositions();
       setDraggedComponentId(null);
     }
+  };
+
+  // Start panning on middle-click or right-click
+  const handleCanvasMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 1 || e.button === 2) {
+      e.preventDefault();
+      isPanningRef.current = true;
+      panStartRef.current = {
+        mouseX: e.clientX,
+        mouseY: e.clientY,
+        panX: panRef.current.x,
+        panY: panRef.current.y,
+      };
+    }
+  };
+
+  // Zoom centered on cursor
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const factor = e.deltaY < 0 ? 1.1 : 0.9;
+    const newZoom = Math.min(5, Math.max(0.1, zoomRef.current * factor));
+
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    // Keep the world point under the cursor fixed
+    const worldX = (mx - panRef.current.x) / zoomRef.current;
+    const worldY = (my - panRef.current.y) / zoomRef.current;
+    const newPan = {
+      x: mx - worldX * newZoom,
+      y: my - worldY * newZoom,
+    };
+
+    zoomRef.current = newZoom;
+    panRef.current = newPan;
+    setZoom(newZoom);
+    setPan(newPan);
+  };
+
+  const handleResetView = () => {
+    zoomRef.current = 1;
+    panRef.current = { x: 0, y: 0 };
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
   };
 
   // Wire creation via pin clicks
@@ -418,6 +492,19 @@ export const SimulatorCanvas = () => {
           </div>
 
           <div className="canvas-header-right">
+            {/* Zoom controls */}
+            <div className="zoom-controls">
+              <button className="zoom-btn" onClick={() => handleWheel({ deltaY: 100, clientX: 0, clientY: 0, preventDefault: () => {} } as any)} title="Zoom out">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              </button>
+              <button className="zoom-level" onClick={handleResetView} title="Reset view (click to reset)">
+                {Math.round(zoom * 100)}%
+              </button>
+              <button className="zoom-btn" onClick={() => handleWheel({ deltaY: -100, clientX: 0, clientY: 0, preventDefault: () => {} } as any)} title="Zoom in">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              </button>
+            </div>
+
             {/* Component count */}
             <span className="component-count" title={`${components.length} component${components.length !== 1 ? 's' : ''}`}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -445,42 +532,52 @@ export const SimulatorCanvas = () => {
         <div
           ref={canvasRef}
           className="canvas-content"
+          onMouseDown={handleCanvasMouseDown}
           onMouseMove={handleCanvasMouseMove}
           onMouseUp={handleCanvasMouseUp}
+          onMouseLeave={() => { isPanningRef.current = false; setPan({ ...panRef.current }); setDraggedComponentId(null); }}
+          onWheel={handleWheel}
+          onContextMenu={(e) => e.preventDefault()}
           onClick={() => setSelectedComponentId(null)}
-          style={{ cursor: wireInProgress ? 'crosshair' : 'default' }}
+          style={{ cursor: isPanningRef.current ? 'grabbing' : wireInProgress ? 'crosshair' : 'default' }}
         >
-          {/* Wire Layer - Renders below all components */}
-          <WireLayer />
+          {/* Infinite world — pan+zoom applied here */}
+          <div
+            className="canvas-world"
+            style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
+          >
+            {/* Wire Layer - Renders below all components */}
+            <WireLayer />
 
-          {/* Board visual — switches based on selected board type */}
-          {boardType === 'arduino-uno' ? (
-            <ArduinoUno
-              x={ARDUINO_POSITION.x}
-              y={ARDUINO_POSITION.y}
-              led13={Boolean(components.find((c) => c.id === 'led-builtin')?.properties.state)}
+            {/* Board visual — switches based on selected board type */}
+            {boardType === 'arduino-uno' ? (
+              <ArduinoUno
+                x={ARDUINO_POSITION.x}
+                y={ARDUINO_POSITION.y}
+                led13={Boolean(components.find((c) => c.id === 'led-builtin')?.properties.state)}
+              />
+            ) : (
+              <NanoRP2040
+                x={ARDUINO_POSITION.x}
+                y={ARDUINO_POSITION.y}
+                ledBuiltIn={Boolean(components.find((c) => c.id === 'led-builtin')?.properties.state)}
+              />
+            )}
+
+            {/* Board pin overlay */}
+            <PinOverlay
+              componentId={boardType === 'arduino-uno' ? 'arduino-uno' : 'nano-rp2040'}
+              componentX={ARDUINO_POSITION.x}
+              componentY={ARDUINO_POSITION.y}
+              onPinClick={handlePinClick}
+              showPins={true}
+              wrapperOffsetX={0}
+              wrapperOffsetY={0}
             />
-          ) : (
-            <NanoRP2040
-              x={ARDUINO_POSITION.x}
-              y={ARDUINO_POSITION.y}
-              ledBuiltIn={Boolean(components.find((c) => c.id === 'led-builtin')?.properties.state)}
-            />
-          )}
 
-          {/* Board pin overlay */}
-          <PinOverlay
-            componentId={boardType === 'arduino-uno' ? 'arduino-uno' : 'nano-rp2040'}
-            componentX={ARDUINO_POSITION.x}
-            componentY={ARDUINO_POSITION.y}
-            onPinClick={handlePinClick}
-            showPins={true}
-            wrapperOffsetX={0}
-            wrapperOffsetY={0}
-          />
-
-          {/* Components using wokwi-elements */}
-          <div className="components-area">{registryLoaded && components.map(renderComponent)}</div>
+            {/* Components using wokwi-elements */}
+            <div className="components-area">{registryLoaded && components.map(renderComponent)}</div>
+          </div>
         </div>
       </div>
 

@@ -150,16 +150,27 @@
   cursor: not-allowed;
 }
 
-/* ── Canvas content ──────────────────────────────── */
+/* ── Canvas content (viewport) ───────────────────── */
 .canvas-content {
   flex: 1;
-  padding: 20px;
   position: relative;
-  overflow: auto;
+  overflow: hidden;
   background-color: #1a1a1a;
   background-image:
     repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255,255,255,0.025) 19px, rgba(255,255,255,0.025) 20px),
     repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255,255,255,0.025) 19px, rgba(255,255,255,0.025) 20px);
+  user-select: none;
+}
+
+/* ── Infinite canvas world ───────────────────────── */
+.canvas-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  /* min size so content is reachable even when empty */
+  width: 4000px;
+  height: 3000px;
 }
 
 /* ── Components area ─────────────────────────────── */
@@ -169,6 +180,55 @@
   left: 0;
   right: 0;
   bottom: 0;
+}
+
+/* ── Zoom controls ───────────────────────────────── */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  border-radius: 5px;
+  padding: 0 2px;
+  height: 28px;
+}
+
+.zoom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: #9d9d9d;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.zoom-btn:hover {
+  background: #3a3a3a;
+  color: #ccc;
+}
+
+.zoom-level {
+  min-width: 42px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: #9d9d9d;
+  font-size: 11px;
+  font-family: monospace;
+  cursor: pointer;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+.zoom-level:hover {
+  background: #3a3a3a;
+  color: #ccc;
 }
 
 .component-label {
