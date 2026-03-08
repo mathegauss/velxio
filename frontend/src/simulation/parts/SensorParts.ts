@@ -489,3 +489,118 @@ PartSimulationRegistry.register('neopixel-matrix', {
         return unsub;
     },
 });
+
+// ─── Single NeoPixel (WS2812B) ───────────────────────────────────────────────
+
+/**
+ * Single addressable RGB LED — decodes the WS2812B data stream on DIN
+ * and updates the element's r/g/b properties (0–1 range).
+ */
+PartSimulationRegistry.register('neopixel', {
+    attachEvents: (element, simulator, getArduinoPinHelper) => {
+        const pinDIN = getArduinoPinHelper('DIN');
+        if (pinDIN === null) return () => {};
+
+        const el = element as any;
+
+        const unsub = createNeopixelDecoder(
+            (simulator as any),
+            pinDIN,
+            (_index, r, g, b) => {
+                el.r = r / 255;
+                el.g = g / 255;
+                el.b = b / 255;
+            },
+        );
+
+        return unsub;
+    },
+});
+
+// ─── PIR Motion Sensor ───────────────────────────────────────────────────────
+
+/**
+ * PIR motion sensor — click the element to simulate a motion event.
+ * OUT pin goes HIGH for 3 seconds then returns LOW.
+ */
+PartSimulationRegistry.register('pir-motion-sensor', {
+    attachEvents: (element, simulator, getArduinoPinHelper) => {
+        const pin = getArduinoPinHelper('OUT');
+        if (pin === null) return () => {};
+
+        simulator.setPinState(pin, false); // idle LOW
+
+        let timer: ReturnType<typeof setTimeout> | null = null;
+
+        const onClick = () => {
+            if (timer !== null) clearTimeout(timer);
+            simulator.setPinState(pin, true); // motion detected → HIGH
+            console.log('[PIR] Motion detected → OUT HIGH');
+            timer = setTimeout(() => {
+                simulator.setPinState(pin, false);
+                timer = null;
+                console.log('[PIR] Motion ended → OUT LOW');
+            }, 3000);
+        };
+
+        element.addEventListener('click', onClick);
+        return () => {
+            element.removeEventListener('click', onClick);
+            if (timer !== null) clearTimeout(timer);
+        };
+    },
+});
+
+// ─── KS2E-M-DC5 Relay ────────────────────────────────────────────────────────
+
+/**
+ * Dual-coil relay — listens for COIL1/COIL2 pin state changes.
+ * In a typical Arduino circuit the Arduino drives the coil and the relay
+ * switches a separate load circuit; no electrical feedback is needed.
+ */
+PartSimulationRegistry.register('ks2e-m-dc5', {
+    onPinStateChange: (pinName, state, _element) => {
+        if (pinName === 'COIL1' || pinName === 'COIL2') {
+            console.log(`[Relay KS2E] ${pinName} → ${state ? 'ACTIVATED' : 'RELEASED'}`);
+        }
+    },
+});
+
+// ─── HC-SR04 Ultrasonic Distance Sensor ──────────────────────────────────────
+
+/**
+ * Ultrasonic sensor — monitors the TRIG pin.
+ * When TRIG goes HIGH the sensor responds with an ECHO HIGH pulse
+ * simulating an object at ~10 cm (≈582 µs echo width → 1 ms real-time).
+ */
+PartSimulationRegistry.register('hc-sr04', {
+    attachEvents: (element, simulator, getArduinoPinHelper) => {
+        const trigPin = getArduinoPinHelper('TRIG');
+        const echoPin = getArduinoPinHelper('ECHO');
+        if (trigPin === null || echoPin === null) return () => {};
+
+        simulator.setPinState(echoPin, false); // ECHO LOW initially
+
+        let echoTimer: ReturnType<typeof setTimeout> | null = null;
+
+        const cleanup = simulator.pinManager.onPinChange(trigPin, (_: number, state: boolean) => {
+            if (state) {
+                // TRIG HIGH — fire ECHO pulse after ~1 ms
+                if (echoTimer !== null) clearTimeout(echoTimer);
+                echoTimer = setTimeout(() => {
+                    simulator.setPinState(echoPin, true); // ECHO HIGH
+                    console.log('[HC-SR04] ECHO HIGH (10 cm)');
+                    echoTimer = setTimeout(() => {
+                        simulator.setPinState(echoPin, false); // ECHO LOW
+                        echoTimer = null;
+                    }, 1); // 1 ms ≈ 582 µs → ~10 cm
+                }, 1);
+            }
+        });
+
+        return () => {
+            cleanup();
+            if (echoTimer !== null) clearTimeout(echoTimer);
+        };
+    },
+});

@@ -21,7 +21,12 @@ declare namespace JSX {
     'wokwi-ds1307': any;
     'wokwi-hc-sr04': any;
     'wokwi-ir-receiver': any;
+    'wokwi-ir-remote': any;
     'wokwi-pir-motion-sensor': any;
+    'wokwi-ssd1306': any;
+    'wokwi-hx711': any;
+    'wokwi-mpu6050': any;
+    'wokwi-microsd-card': any;
     'wokwi-photoresistor-sensor': any;
     'wokwi-74hc595': any;
     'wokwi-stepper-motor': any;
@@ -35,7 +40,14 @@ declare namespace JSX {
     'wokwi-small-sound-sensor': any;
     'wokwi-led-ring': any;
     'wokwi-neopixel-matrix': any;
-    'wokwi-lcd1602': any;
     'wokwi-ky-040': any;
+    'wokwi-rotary-dialer': any;
+    'wokwi-ks2e-m-dc5': any;
+    'wokwi-logic-and': any;
+    'wokwi-logic-nand': any;
+    'wokwi-logic-or': any;
+    'wokwi-logic-nor': any;
+    'wokwi-logic-xor': any;
+    'wokwi-logic-not': any;
   }
 }

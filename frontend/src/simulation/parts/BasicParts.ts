@@ -309,3 +309,115 @@ PartSimulationRegistry.register('biaxial-stepper', {
         return () => { cleanup1(); cleanup2(); };
     },
 });
+
+// ─── Membrane Keypad ─────────────────────────────────────────────────────────
+
+/**
+ * 4×4 membrane keypad — simulates the row/column matrix scanning.
+ * When the Arduino drives a ROW pin LOW and a key in that row is pressed,
+ * the corresponding COL pin is pulled LOW (shorted through the membrane).
+ */
+PartSimulationRegistry.register('membrane-keypad', {
+    attachEvents: (element, simulator, getArduinoPinHelper) => {
+        const rowPins: (number | null)[] = [
+            getArduinoPinHelper('R1'), getArduinoPinHelper('R2'),
+            getArduinoPinHelper('R3'), getArduinoPinHelper('R4'),
+        ];
+        const colPins: (number | null)[] = [
+            getArduinoPinHelper('C1'), getArduinoPinHelper('C2'),
+            getArduinoPinHelper('C3'), getArduinoPinHelper('C4'),
+        ];
+
+        const pressedKeys = new Set<string>(); // 'row,col'
+        const activeRows  = new Set<number>();  // row indices currently driven LOW
+        const cleanups: (() => void)[] = [];
+
+        const updateCol = (col: number) => {
+            const cPin = colPins[col];
+            if (cPin === null) return;
+            const colLow = [...activeRows].some(r => pressedKeys.has(`${r},${col}`));
+            simulator.setPinState(cPin, !colLow);
+        };
+
+        for (let r = 0; r < 4; r++) {
+            const rPin = rowPins[r];
+            if (rPin === null) continue;
+            const row = r;
+            const c = simulator.pinManager.onPinChange(rPin, (_: number, state: boolean) => {
+                if (!state) { activeRows.add(row); } else { activeRows.delete(row); }
+                for (let col = 0; col < 4; col++) updateCol(col);
+            });
+            cleanups.push(c);
+        }
+
+        const onPress = (e: Event) => {
+            const { row, column } = (e as CustomEvent).detail;
+            pressedKeys.add(`${row},${column}`);
+            if (activeRows.has(row)) updateCol(column);
+        };
+        const onRelease = (e: Event) => {
+            const { row, column } = (e as CustomEvent).detail;
+            pressedKeys.delete(`${row},${column}`);
+            updateCol(column);
+        };
+
+        element.addEventListener('button-press', onPress);
+        element.addEventListener('button-release', onRelease);
+        return () => {
+            cleanups.forEach(c => c());
+            element.removeEventListener('button-press', onPress);
+            element.removeEventListener('button-release', onRelease);
+        };
+    },
+});
+
+// ─── Rotary Dialer ───────────────────────────────────────────────────────────
+
+/**
+ * Rotary phone dialer — fires PULSE/DIAL pin signals matching vintage
+ * PSTN rotary-dial behaviour:
+ *   DIAL goes LOW while the dial is rotating and HIGH when done.
+ *   PULSE fires n pulses (digit 0 → 10 pulses) at ~100 ms intervals.
+ */
+PartSimulationRegistry.register('rotary-dialer', {
+    attachEvents: (element, simulator, getArduinoPinHelper) => {
+        const dialPin  = getArduinoPinHelper('DIAL');
+        const pulsePin = getArduinoPinHelper('PULSE');
+        if (dialPin === null || pulsePin === null) return () => {};
+
+        // Idle: both HIGH (active LOW signalling)
+        simulator.setPinState(dialPin,  true);
+        simulator.setPinState(pulsePin, true);
+
+        const onDialStart = () => {
+            simulator.setPinState(dialPin, false); // LOW = dialing in progress
+        };
+
+        const onDialEnd = (e: Event) => {
+            const digit = (e as CustomEvent).detail.digit as number;
+            const pulseCount = digit === 0 ? 10 : digit;
+            let i = 0;
+            const firePulse = () => {
+                if (i < pulseCount) {
+                    simulator.setPinState(pulsePin, false); // PULSE LOW
+                    setTimeout(() => {
+                        simulator.setPinState(pulsePin, true); // PULSE HIGH
+                        i++;
+                        setTimeout(firePulse, 60);
+                    }, 60);
+                } else {
+                    simulator.setPinState(dialPin, true); // DIAL HIGH = done
+                    console.log(`[RotaryDialer] dialed ${digit}`);
+                }
+            };
+            setTimeout(firePulse, 100);
+        };
+
+        element.addEventListener('dial-start', onDialStart);
+        element.addEventListener('dial-end',   onDialEnd);
+        return () => {
+            element.removeEventListener('dial-start', onDialStart);
+            element.removeEventListener('dial-end',   onDialEnd);
+        };
+    },
+});

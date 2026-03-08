@@ -1836,6 +1836,109 @@
         "motor",
         "nema"
       ]
+    },
+    {
+      "id": "logic-gate-and",
+      "tagName": "wokwi-logic-and",
+      "name": "AND Gate",
+      "description": "2-input AND logic gate",
+      "category": "logic-gates",
+      "pinCount": 3,
+      "width": 72,
+      "height": 48,
+      "defaultProperties": {},
+      "properties": [],
+      "keywords": [
+        "logic",
+        "gate",
+        "and"
+      ]
+    },
+    {
+      "id": "logic-gate-nand",
+      "tagName": "wokwi-logic-nand",
+      "name": "NAND Gate",
+      "description": "2-input NAND logic gate",
+      "category": "logic-gates",
+      "pinCount": 3,
+      "width": 72,
+      "height": 48,
+      "defaultProperties": {},
+      "properties": [],
+      "keywords": [
+        "logic",
+        "gate",
+        "nand"
+      ]
+    },
+    {
+      "id": "logic-gate-or",
+      "tagName": "wokwi-logic-or",
+      "name": "OR Gate",
+      "description": "2-input OR logic gate",
+      "category": "logic-gates",
+      "pinCount": 3,
+      "width": 72,
+      "height": 48,
+      "defaultProperties": {},
+      "properties": [],
+      "keywords": [
+        "logic",
+        "gate",
+        "or"
+      ]
+    },
+    {
+      "id": "logic-gate-nor",
+      "tagName": "wokwi-logic-nor",
+      "name": "NOR Gate",
+      "description": "2-input NOR logic gate",
+      "category": "logic-gates",
+      "pinCount": 3,
+      "width": 72,
+      "height": 48,
+      "defaultProperties": {},
+      "properties": [],
+      "keywords": [
+        "logic",
+        "gate",
+        "nor"
+      ]
+    },
+    {
+      "id": "logic-gate-xor",
+      "tagName": "wokwi-logic-xor",
+      "name": "XOR Gate",
+      "description": "2-input XOR logic gate",
+      "category": "logic-gates",
+      "pinCount": 3,
+      "width": 72,
+      "height": 48,
+      "defaultProperties": {},
+      "properties": [],
+      "keywords": [
+        "logic",
+        "gate",
+        "xor"
+      ]
+    },
+    {
+      "id": "logic-gate-not",
+      "tagName": "wokwi-logic-not",
+      "name": "NOT Gate",
+      "description": "Single-input NOT gate",
+      "category": "logic-gates",
+      "pinCount": 2,
+      "width": 56,
+      "height": 36,
+      "defaultProperties": {},
+      "properties": [],
+      "keywords": [
+        "logic",
+        "gate",
+        "not",
+        "inverter"
+      ]
     }
   ]
 }
