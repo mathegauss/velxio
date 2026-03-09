@@ -48,6 +48,10 @@ interface SimulatorState {
   pinManager: PinManager;
   running: boolean;
   compiledHex: string | null;
+  /** Increments each time a new hex/binary is loaded — used to re-attach
+   * virtual devices (SSD1306, etc.) to the fresh I2C bus without toggling
+   * on every play/stop cycle. */
+  hexEpoch: number;
 
   // Components
   components: Component[];
@@ -115,6 +119,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
     pinManager,
     running: false,
     compiledHex: null,
+    hexEpoch: 0,
     components: [
       {
         id: 'led-builtin',
@@ -221,7 +226,11 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       if (simulator && simulator instanceof AVRSimulator) {
         try {
           simulator.loadHex(hex);
-          set({ compiledHex: hex });
+          // Re-register background I2C devices on the fresh bus created by loadHex
+          simulator.addI2CDevice(new VirtualDS1307());
+          simulator.addI2CDevice(new VirtualTempSensor());
+          simulator.addI2CDevice(new I2CMemoryDevice(0x50));
+          set((s) => ({ compiledHex: hex, hexEpoch: s.hexEpoch + 1 }));
           console.log('HEX file loaded successfully');
         } catch (error) {
           console.error('Failed to load HEX:', error);
@@ -236,7 +245,11 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       if (simulator && simulator instanceof RP2040Simulator) {
         try {
           simulator.loadBinary(base64);
-          set({ compiledHex: base64 }); // reuse compiledHex as "program loaded" flag
+          // Re-register background I2C devices on the fresh bus
+          simulator.addI2CDevice(new VirtualDS1307() as RP2040I2CDevice);
+          simulator.addI2CDevice(new VirtualTempSensor() as RP2040I2CDevice);
+          simulator.addI2CDevice(new I2CMemoryDevice(0x50) as RP2040I2CDevice);
+          set((s) => ({ compiledHex: base64, hexEpoch: s.hexEpoch + 1 }));
           console.log('Binary loaded into RP2040 successfully');
         } catch (error) {
           console.error('Failed to load binary:', error);
@@ -249,16 +262,8 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
     startSimulation: () => {
       const { simulator } = get();
       if (simulator) {
-        // Register virtual I2C devices before starting
-        if (simulator instanceof AVRSimulator && simulator.i2cBus) {
-          simulator.addI2CDevice(new VirtualDS1307());
-          simulator.addI2CDevice(new VirtualTempSensor());
-          simulator.addI2CDevice(new I2CMemoryDevice(0x50));
-        } else if (simulator instanceof RP2040Simulator) {
-          simulator.addI2CDevice(new VirtualDS1307() as RP2040I2CDevice);
-          simulator.addI2CDevice(new VirtualTempSensor() as RP2040I2CDevice);
-          simulator.addI2CDevice(new I2CMemoryDevice(0x50) as RP2040I2CDevice);
-        }
+        // Background I2C devices are registered in loadHex/loadBinary,
+        // so we just need to start the CPU loop here.
         simulator.start();
         set({ running: true, serialMonitorOpen: true });
       }

@@ -51,6 +51,13 @@ export const DynamicComponent: React.FC<DynamicComponentProps> = ({
   const handleComponentEvent = useSimulatorStore((s) => s.handleComponentEvent);
   const running = useSimulatorStore((s) => s.running);
   const simulator = useSimulatorStore((s) => s.simulator);
+  // hexEpoch increments each time a new hex is loaded, triggering a fresh
+  // attachEvents call (and re-registration of I2C devices on the new bus).
+  // We intentionally do NOT depend on `running` so that I2C displays and
+  // other protocol parts (SSD1306, DS1307 …) are NOT torn down and
+  // re-created on every stop/play cycle — which previously caused the
+  // display to flash blank and lose its frame buffer.
+  const hexEpoch = useSimulatorStore((s) => s.hexEpoch);
 
   // Check if component is interactive (has simulation logic with attachEvents)
   const logic = PartSimulationRegistry.get(metadata.id || id.split('-')[0]);
@@ -187,7 +194,7 @@ export const DynamicComponent: React.FC<DynamicComponentProps> = ({
     const logic = PartSimulationRegistry.get(metadata.id || id.split('-')[0]);
 
     let cleanupSimulationEvents: (() => void) | undefined;
-    if (logic && logic.attachEvents && simulator && running) {
+    if (logic && logic.attachEvents && simulator) {
       // Helper to find Arduino pin connected to a component pin
       const getArduinoPin = (componentPinName: string): number | null => {
         const wires = useSimulatorStore.getState().wires.filter(
@@ -216,7 +223,7 @@ export const DynamicComponent: React.FC<DynamicComponentProps> = ({
       el.removeEventListener('button-press', onButtonPress);
       el.removeEventListener('button-release', onButtonRelease);
     };
-  }, [id, handleComponentEvent, metadata.id, simulator, running]);
+  }, [id, handleComponentEvent, metadata.id, simulator, hexEpoch]);
 
   return (
     <div

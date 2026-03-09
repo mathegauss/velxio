@@ -224,6 +224,40 @@
       ]
     },
     {
+      "id": "ili9341-cap-touch",
+      "tagName": "wokwi-ili9341",
+      "name": "ILI9341 Cap Touch",
+      "category": "displays",
+      "description": "ILI9341 TFT display with FT6206 capacitive touch controller",
+      "thumbnail": "<svg width=\"64\" height=\"64\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"64\" height=\"64\" fill=\"#e0e0e0\" rx=\"4\"/><text x=\"50%\" y=\"50%\" text-anchor=\"middle\" dy=\".3em\" font-size=\"9\" fill=\"#666\">ILI9341 CAP</text></svg>",
+      "properties": [
+        {
+          "name": "flipHorizontal",
+          "type": "string",
+          "defaultValue": false,
+          "control": "text"
+        },
+        {
+          "name": "flipVertical",
+          "type": "string",
+          "defaultValue": false,
+          "control": "text"
+        }
+      ],
+      "defaultValues": {
+        "flipHorizontal": false,
+        "flipVertical": false
+      },
+      "pinCount": 0,
+      "tags": [
+        "ili9341",
+        "ili9341-cap-touch",
+        "tft",
+        "capacitive",
+        "touch"
+      ]
+    },
+    {
       "id": "lcd2004",
       "tagName": "wokwi-lcd2004",
       "name": "LCD2004",

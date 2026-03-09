@@ -347,6 +347,11 @@ PartSimulationRegistry.register('buzzer', {
                 gainNode.gain.value = 0.1;
                 gainNode.connect(audioCtx.destination);
             }
+            // Browser autoplay policy: AudioContext starts in 'suspended' state
+            // until a user gesture has occurred. Resume it here so sound plays.
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
             if (oscillator) {
                 oscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.01);
                 return;
@@ -559,6 +564,7 @@ function createLcdSimulation(cols: number, rows: number) {
 
 PartSimulationRegistry.register('lcd1602', createLcdSimulation(16, 2));
 PartSimulationRegistry.register('lcd2004', createLcdSimulation(20, 4));
+PartSimulationRegistry.register('lcd2002', createLcdSimulation(20, 2));
 
 // ─── ILI9341 TFT Display (SPI) ───────────────────────────────────────────────
 
@@ -574,7 +580,7 @@ PartSimulationRegistry.register('lcd2004', createLcdSimulation(20, 4));
  *
  * DC/RS pin: LOW = command byte, HIGH = data bytes.
  */
-PartSimulationRegistry.register('ili9341', {
+const ili9341Simulation = {
     attachEvents: (element, avrSimulator, getArduinoPinHelper) => {
         const el = element as any;
         const pinManager = (avrSimulator as any).pinManager;
@@ -740,4 +746,8 @@ PartSimulationRegistry.register('ili9341', {
             unsubscribers.forEach(u => u());
         };
     },
-});
+};
+
+PartSimulationRegistry.register('ili9341', ili9341Simulation);
+// board-ili9341-cap-touch (Wokwi type) maps to 'ili9341-cap-touch' metadataId — same SPI simulation
+PartSimulationRegistry.register('ili9341-cap-touch', ili9341Simulation);
