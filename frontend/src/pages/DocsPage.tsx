@@ -509,32 +509,59 @@ export const DocsPage: React.FC = () => {
   // Capture the original <head> values once on mount and restore them on unmount
   useEffect(() => {
     const origTitle = document.title;
-    const descEl = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    const origDesc = descEl?.getAttribute('content') ?? '';
-    const canonicalEl = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    const origCanonical = canonicalEl?.getAttribute('href') ?? '';
+
+    // Helper to capture an element and its original attribute value
+    const snap = <E extends Element>(selector: string, attr: string): [E | null, string] => {
+      const el = document.querySelector<E>(selector);
+      return [el, el?.getAttribute(attr) ?? ''];
+    };
+
+    const [descEl, origDesc] = snap<HTMLMetaElement>('meta[name="description"]', 'content');
+    const [canonicalEl, origCanonical] = snap<HTMLLinkElement>('link[rel="canonical"]', 'href');
+    const [ogTitleEl, origOgTitle] = snap<HTMLMetaElement>('meta[property="og:title"]', 'content');
+    const [ogDescEl, origOgDesc] = snap<HTMLMetaElement>('meta[property="og:description"]', 'content');
+    const [ogUrlEl, origOgUrl] = snap<HTMLMetaElement>('meta[property="og:url"]', 'content');
+    const [twTitleEl, origTwTitle] = snap<HTMLMetaElement>('meta[name="twitter:title"]', 'content');
+    const [twDescEl, origTwDesc] = snap<HTMLMetaElement>('meta[name="twitter:description"]', 'content');
 
     return () => {
       document.title = origTitle;
-      if (descEl) descEl.setAttribute('content', origDesc);
-      if (canonicalEl) canonicalEl.setAttribute('href', origCanonical);
+      descEl?.setAttribute('content', origDesc);
+      canonicalEl?.setAttribute('href', origCanonical);
+      ogTitleEl?.setAttribute('content', origOgTitle);
+      ogDescEl?.setAttribute('content', origOgDesc);
+      ogUrlEl?.setAttribute('content', origOgUrl);
+      twTitleEl?.setAttribute('content', origTwTitle);
+      twDescEl?.setAttribute('content', origTwDesc);
       document.getElementById('docs-jsonld')?.remove();
     };
   }, []); // runs once on mount; cleanup runs once on unmount
 
-  // Update document title, meta description, canonical, and JSON-LD per section.
+  // Update all head metadata + JSON-LD per section.
   // No cleanup here — the mount effect above restores defaults on unmount,
   // and on a section change the next run of this effect immediately overwrites.
   useEffect(() => {
     const meta = SECTION_META[activeSection];
+    const pageUrl = `https://velxio.dev/docs/${activeSection}`;
 
     document.title = meta.title;
 
-    const descEl = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    if (descEl) descEl.setAttribute('content', meta.description);
+    const set = (selector: string, value: string) =>
+      document.querySelector<HTMLMetaElement>(selector)?.setAttribute('content', value);
+
+    set('meta[name="description"]', meta.description);
+    set('meta[property="og:title"]', meta.title);
+    set('meta[property="og:description"]', meta.description);
+    set('meta[property="og:url"]', pageUrl);
+    set('meta[name="twitter:title"]', meta.title);
+    set('meta[name="twitter:description"]', meta.description);
 
     const canonicalEl = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    if (canonicalEl) canonicalEl.setAttribute('href', `https://velxio.dev/docs/${activeSection}`);
+    if (canonicalEl) canonicalEl.setAttribute('href', pageUrl);
+
+    // Build the breadcrumb section label for JSON-LD
+    const activeNav = NAV_ITEMS.find((i) => i.id === activeSection);
+    const sectionLabel = activeNav?.label ?? activeSection;
 
     // Inject / update JSON-LD structured data for this doc page
     const ldId = 'docs-jsonld';
@@ -547,13 +574,25 @@ export const DocsPage: React.FC = () => {
     }
     ldScript.textContent = JSON.stringify({
       '@context': 'https://schema.org',
-      '@type': 'TechArticle',
-      headline: meta.title,
-      description: meta.description,
-      url: `https://velxio.dev/docs/${activeSection}`,
-      isPartOf: { '@type': 'WebSite', url: 'https://velxio.dev/', name: 'Velxio' },
-      inLanguage: 'en-US',
-      author: { '@type': 'Person', name: 'David Montero Crespo', url: 'https://github.com/davidmonterocrespo24' },
+      '@graph': [
+        {
+          '@type': 'TechArticle',
+          headline: meta.title,
+          description: meta.description,
+          url: pageUrl,
+          isPartOf: { '@type': 'WebSite', url: 'https://velxio.dev/', name: 'Velxio' },
+          inLanguage: 'en-US',
+          author: { '@type': 'Person', name: 'David Montero Crespo', url: 'https://github.com/davidmonterocrespo24' },
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://velxio.dev/' },
+            { '@type': 'ListItem', position: 2, name: 'Documentation', item: 'https://velxio.dev/docs/intro' },
+            { '@type': 'ListItem', position: 3, name: sectionLabel, item: pageUrl },
+          ],
+        },
+      ],
     });
   }, [activeSection]);
 

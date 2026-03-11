@@ -176,8 +176,6 @@ The `AVRSimulator` (`frontend/src/simulation/AVRSimulator.ts`) uses avr8js to cr
 
 ```typescript
 import { CPU, avrInstruction, AVRTimer, AVRUSART, AVRADC, AVRIOPort } from 'avr8js';
-```typescript
-import { CPU, avrInstruction, AVRTimer, AVRUSART, AVRADC, AVRIOPort } from 'avr8js';
 
 // ATmega328p CPU at 16MHz
 const cpu = new CPU(programMemory);
